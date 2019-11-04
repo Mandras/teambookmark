@@ -12,7 +12,7 @@ Your team will be able to consult / modify / create new bookmarks.
 
 To retrieve a `TeamKey`, you must register on the website [https://www.teambookmark.org](https://www.teambookmark.org)
 
-*The service is 100% free !*
+**The service is 100% free !**
 
 ![example](https://www.teambookmark.org/images/ext/screenshot1.png)
 
