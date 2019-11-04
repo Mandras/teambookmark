@@ -3,11 +3,16 @@
 ## What is it ?
 
 Team Bookmark is an extension for Mozilla Firefox and Google Chrome.
+
 It is used to easily synchronize a bookmark folder with a team.
+
 To share a bookmark folder is very simple, just share a `TeamKey` to the team members; then put it in the options of the extension.
+
 Your team will be able to consult / modify / create new bookmarks.
+
 To retrieve a `TeamKey`, you must register on the website [https://www.teambookmark.org](https://www.teambookmark.org)
-The service is 100% free !
+
+*The service is 100% free !*
 
 ![example](https://www.teambookmark.org/images/ext/screenshot1.png)
 
