@@ -1,0 +1,87 @@
+* { box-sizing: border-box; }
+
+body {
+	font-family: sans-serif;
+	font: message-box;
+	line-height: 20px;
+	font-size: 15px;
+	color: #333;
+}
+
+a, a:visited, a:hover {
+	text-decoration: underline;
+	color: #222;
+}
+
+code {
+	background-color: #EEEEEE;
+	font-family: monospace;
+	border-radius: 3px;
+	line-height: 1rem;
+	padding: 2px 4px;
+	font-size: 12px;
+	color: #b02;
+}
+
+textarea {
+	border: 1px solid #444444;
+	font-family: monospace;
+	letter-spacing: 1px;
+	background: #666666;
+	padding: 5px 7px;
+	font-size: 14px;
+	color: #EEEEEE;
+	height: 100px;
+	resize: none;
+	width: 100%;
+}
+
+button {
+	border: 0;
+	border-bottom: 1px solid transparent;
+	background: #e1e1e2;
+	border-radius: 4px;
+	padding: 6px 15px;
+	font-weight: bold;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+button:active {
+	margin-top: 1px;
+	border-bottom: 0;
+}
+
+table {
+	border-collapse: collapse;
+	margin: 15px 0;
+	width: 100%;
+}
+
+th {
+	text-align: center;
+	font-weight: bold;
+	width: 150px;
+}
+
+th, td {
+	border: 1px solid #E0E0E0;
+	padding: 15px;
+}
+
+ul {
+	padding: 0 0 0 20px;
+	display: block;
+	margin: 0;
+}
+
+#saved {
+	transition: opacity 0.3s;
+	margin: 0 0 0 20px;
+	font-weight: bold;
+	font-size: 16px;
+	color: #00b53a;
+	opacity: 0;
+}
+
+#saved.saving { opacity: 1; }
