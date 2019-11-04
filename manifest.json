@@ -35,8 +35,7 @@
 		"https://www.teambookmark.org/*",
 		"webRequest",
 		"bookmarks",
-		"storage",
-		"menus"
+		"storage"
 	],
 
 	"background": {
