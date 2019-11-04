@@ -1,5 +1,6 @@
 var domain = "https://www.teambookmark.org";
 var folder_name_pre = "✔️ ";
+var empty_tbtree_issu = [];
 var is_chrome = false;
 var root_id = '';
 var main_id = '';
@@ -7,7 +8,7 @@ var folder_name;
 var version = 0;
 var options;
 
-function ff_error(error) { console.log(`An error: ${error}`); }
+function ff_error(error) { console.error(`${error}`); }
 
 // sub-function => synchronize_folder_found
 function synchronize_folder_found(items) {
@@ -83,6 +84,8 @@ function synchronize_after_storage(item) {
 
 					if (obj.app.name == "team-bookmark" && typeof obj.folder_name != "undefined" && obj.folder_name.length > 0) {
 
+						if (typeof obj.bookmarks != "undefined") { empty_tbtree_issu = obj.bookmarks; }
+
 						folder_name = obj.folder_name;
 
 						version = obj.meta.version;
@@ -114,7 +117,7 @@ function synchronize_after_storage(item) {
 
 // sub-function => update_continue_process
 function update_continue_process(node) {
-	if (typeof node != "undefined") {
+	if (typeof node != "undefined" && node != null) {
 		if (node[0].title != folder_name_pre + folder_name) {
 			if (is_chrome) {
 				browser.bookmarks.update(node[0].id, {
@@ -153,7 +156,10 @@ function update_continue_process(node) {
 		};
 		xhr.send(data);
 	}
-	else { version = 0; }
+	else {
+		console.info("the main folder has been deleted, reseting local version");
+		version = 0;
+	}
 }
 
 // sub-function => compare_subtree
@@ -179,22 +185,29 @@ function compare_subtree(node) {
 		}
 	}
 
-	var system_tree = this.system_tree;
-	var tb_tree = this.tb_tree;
-
 	setTimeout(function() {
 
-		var system_tree = this.system_tree;
-		var tb_tree = this.tb_tree;
-
 		var index = 0;
-		if (typeof tb_tree != "undefined") {
+
+		if (typeof this.tb_tree == "undefined") {
+			var tb_tree = empty_tbtree_issu;
+			console.info("Fallback: tb_tree is undefined, get new value =>");
+		}
+		else { var tb_tree = this.tb_tree; }
+
+		if (typeof this.system_tree == "undefined" || typeof this.system_tree.id == "undefined") {
+			var system_tree_id = main_id;
+			console.info("Fallback: system_tree.id is undefined, get new value =>");
+		}
+		else { var system_tree_id = this.system_tree.id; }
+
+		if (typeof tb_tree != "undefined" && tb_tree.length > 0 && typeof system_tree_id != "undefined") {
 			for (var i = 0; i < tb_tree.length; i++) {
 				/* BOOKMARK */
 				if (tb_tree[i].url != null) {
 					if (is_chrome) {
 						browser.bookmarks.create({
-							parentId: system_tree.id,
+							parentId: system_tree_id,
 							title: tb_tree[i].title,
 							url: tb_tree[i].url,
 							index: tb_tree[i].index
@@ -202,7 +215,7 @@ function compare_subtree(node) {
 					}
 					else {
 						var creation = browser.bookmarks.create({
-							parentId: system_tree.id,
+							parentId: system_tree_id,
 							title: tb_tree[i].title,
 							url: tb_tree[i].url,
 							index: tb_tree[i].index
@@ -216,7 +229,7 @@ function compare_subtree(node) {
 				else if (tb_tree[i].title != null && tb_tree[i].title.length > 0) {
 					if (is_chrome) {
 						browser.bookmarks.create({
-							parentId: system_tree.id,
+							parentId: system_tree_id,
 							title: tb_tree[i].title,
 							index: tb_tree[i].index
 						}, function(node) {
@@ -225,7 +238,7 @@ function compare_subtree(node) {
 					}
 					else {
 						var creation = browser.bookmarks.create({
-							parentId: system_tree.id,
+							parentId: system_tree_id,
 							title: tb_tree[i].title,
 							index: tb_tree[i].index
 						});
@@ -239,7 +252,7 @@ function compare_subtree(node) {
 				/* SEPARATOR */
 				else if (!is_chrome) {
 					var creation = browser.bookmarks.create({
-						parentId: system_tree.id,
+						parentId: system_tree_id,
 						type: "separator",
 						title: '',
 						url: '',
@@ -252,10 +265,10 @@ function compare_subtree(node) {
 			}
 		}
 		else {
-			console.error("empty tb_tree, reseting local version");
+			console.error("invalid tb_tree || system_tree, reseting local version");
 			version = 0;
 		}
-	}.bind({tb_tree: tb_tree, system_tree: system_tree}), 50);
+	}.bind({tb_tree: this.tb_tree, system_tree: this.system_tree}), 50);
 }
 
 // DO PING
@@ -291,7 +304,10 @@ function update_on_cloud() {
 	}
 	else {
 		var get = browser.bookmarks.getSubTree(main_id);
-		get.then(update_continue_process, ff_error);
+		get.then(update_continue_process, function() {
+			console.info("the main folder has been deleted, reseting local version");
+			version = 0;
+		});
 	}
 }
 

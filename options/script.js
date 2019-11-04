@@ -13,7 +13,7 @@ function after_storage_set() {
 }
 
 function after_storage_get(item) {
-	if (typeof item.options.key !== "undefined") {
+	if (typeof item.options !== "undefined" && typeof item.options.key !== "undefined") {
 		$("key").value = item.options.key.trim()
 	}
 }
