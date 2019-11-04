@@ -14,6 +14,8 @@ To retrieve a `TeamKey`, you must register on the website [https://www.teambookm
 
 **The service is 100% free !**
 
+## Screenshot
+
 ![example](https://www.teambookmark.org/images/ext/screenshot1.png)
 
 ## FAQ
