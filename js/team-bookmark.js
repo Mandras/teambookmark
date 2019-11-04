@@ -1,5 +1,4 @@
 var domain = "https://www.teambookmark.org";
-var folder_name_pre = "✔️ ";
 var empty_tbtree_issu = [];
 var is_chrome = false;
 var root_id = '';
@@ -7,8 +6,38 @@ var main_id = '';
 var folder_name;
 var version = 0;
 var options;
+var emoji;
 
 function ff_error(error) { console.error(`${error}`); }
+
+// sub-function => delete_folder_found
+function delete_folder_found(items) {
+	for (var i = 0; i < items.length; i++) {
+		if (is_chrome) {
+			browser.bookmarks.removeTree(items[i].id);
+		}
+		else {
+			var removing = browser.bookmarks.removeTree(items[i].id);
+			removing.then(function() { }, ff_error);
+		}
+	}
+}
+
+// sub-function => compare_old_folder_name
+function compare_old_folder_name(item) {
+	if (typeof item !== "undefined" && typeof item.last_used_folder_name !== "undefined" && item.last_used_folder_name.length > 0) {
+		var last_used_folder_name = item.last_used_folder_name;
+		if (last_used_folder_name != (emoji + ' ' + folder_name)) {
+			if (is_chrome) {
+				browser.bookmarks.search({ title: last_used_folder_name }, delete_folder_found);
+			}
+			else {
+				var searching = browser.bookmarks.search({ title: last_used_folder_name });
+				searching.then(delete_folder_found, ff_error);
+			}
+		}
+	}
+}
 
 // sub-function => synchronize_folder_found
 function synchronize_folder_found(items) {
@@ -28,24 +57,32 @@ function synchronize_folder_found(items) {
 		if (is_chrome) {
 			browser.bookmarks.create({
 				parentId: root_id,
-				title: folder_name_pre + folder_name,
+				title: emoji + ' ' + folder_name,
 				index: 0
 			}, function(node) {
 				console.info("team-bookmark: create root for toolbar");
 				main_id = node.id;
 				compare_bookmark(node, this.bookmark);
+
+				browser.storage.local.set({
+					last_used_folder_name: emoji + ' ' + folder_name
+				}, function() { });
 			});
 		}
 		else {
 			var creation = browser.bookmarks.create({
 				parentId: root_id,
-				title: folder_name_pre + folder_name,
+				title: emoji + ' ' + folder_name,
 				index: 0
 			});
 			creation.then(function(node) {
 				console.info("team-bookmark: create root for toolbar");
 				main_id = node.id;
 				compare_bookmark(node, this.bookmark);
+
+				browser.storage.local.set({
+					last_used_folder_name: emoji + ' ' + folder_name
+				}).then(function() { }, ff_error);
 			});
 		}		
 	}
@@ -82,13 +119,26 @@ function synchronize_after_storage(item) {
 
 					var obj = xhr.response;
 
-					if (obj.app.name == "team-bookmark" && typeof obj.folder_name != "undefined" && obj.folder_name.length > 0) {
+					if (typeof obj.meta != "undefined" && typeof obj.meta.deleted != "undefined" && obj.meta.deleted == 1) {
+						console.error("team-bookmark: the TeamKey you are using is deleted");
+						return ;
+					}
+
+					if (obj.app.name == "team-bookmark" && typeof obj.meta != "undefined" && typeof obj.meta.folder_name != "undefined" && obj.meta.folder_name.length > 0 && typeof obj.meta.emoji != "undefined" && typeof obj.meta.version != "undefined") {
 
 						if (typeof obj.bookmarks != "undefined") { empty_tbtree_issu = obj.bookmarks; }
 
-						folder_name = obj.folder_name;
-
+						folder_name = obj.meta.folder_name;
+						emoji = obj.meta.emoji;
 						version = obj.meta.version;
+
+						if (is_chrome) {
+							browser.storage.local.get("last_used_folder_name", compare_old_folder_name);
+						}
+						else {
+							var storage = browser.storage.local.get("last_used_folder_name");
+							storage.then(compare_old_folder_name, ff_error);
+						}
 
 						if (browser.bookmarks.onCreated.hasListener(update_on_cloud)) { browser.bookmarks.onCreated.removeListener(update_on_cloud); }
 						if (browser.bookmarks.onRemoved.hasListener(update_on_cloud)) { browser.bookmarks.onRemoved.removeListener(update_on_cloud); }
@@ -96,10 +146,10 @@ function synchronize_after_storage(item) {
 						if (browser.bookmarks.onMoved.hasListener(update_on_cloud))   { browser.bookmarks.onMoved.removeListener(update_on_cloud);   }
 
 						if (is_chrome) {
-							browser.bookmarks.search({ title: folder_name_pre + folder_name }, synchronize_folder_found.bind({bookmark: obj.bookmarks}));
+							browser.bookmarks.search({ title: emoji + ' ' + folder_name }, synchronize_folder_found.bind({bookmark: obj.bookmarks}));
 						}
 						else {
-							var searching = browser.bookmarks.search({ title: folder_name_pre + folder_name });
+							var searching = browser.bookmarks.search({ title: emoji + ' ' + folder_name });
 							searching.then(synchronize_folder_found.bind({bookmark: obj.bookmarks}), ff_error);
 						}
 					}
@@ -118,15 +168,15 @@ function synchronize_after_storage(item) {
 // sub-function => update_continue_process
 function update_continue_process(node) {
 	if (typeof node != "undefined" && node != null) {
-		if (node[0].title != folder_name_pre + folder_name) {
+		if (node[0].title != emoji + ' ' + folder_name) {
 			if (is_chrome) {
 				browser.bookmarks.update(node[0].id, {
-					title: folder_name_pre + folder_name
+					title: emoji + ' ' + folder_name
 				});
 			}
 			else {
 				var updating = browser.bookmarks.update(node[0].id, {
-					title: folder_name_pre + folder_name
+					title: emoji + ' ' + folder_name
 				});
 				updating.then(function() { }, ff_error);
 			}
@@ -191,13 +241,13 @@ function compare_subtree(node) {
 
 		if (typeof this.tb_tree == "undefined") {
 			var tb_tree = empty_tbtree_issu;
-			console.info("Fallback: tb_tree is undefined, get new value =>");
+			console.info("Fallback: tb_tree is undefined, get fallback value");
 		}
 		else { var tb_tree = this.tb_tree; }
 
 		if (typeof this.system_tree == "undefined" || typeof this.system_tree.id == "undefined") {
 			var system_tree_id = main_id;
-			console.info("Fallback: system_tree.id is undefined, get new value =>");
+			console.info("Fallback: system_tree.id is undefined, get fallback value");
 		}
 		else { var system_tree_id = this.system_tree.id; }
 
@@ -263,10 +313,6 @@ function compare_subtree(node) {
 					index++;
 				}
 			}
-		}
-		else {
-			console.error("invalid tb_tree || system_tree, reseting local version");
-			version = 0;
 		}
 	}.bind({tb_tree: this.tb_tree, system_tree: this.system_tree}), 50);
 }
