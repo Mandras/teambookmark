@@ -1,4 +1,12 @@
-==== 0.3 ===
+==== 0.5 ====
+
+- rename "Team Bookmark" to "TeamBookmark"
+
+==== 0.4 ====
+
+- add PRIVACY.md
+
+==== 0.3 ====
 
 - you can now have custom emoji
 - folder rename from website is now working

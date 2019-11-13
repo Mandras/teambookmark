@@ -1,8 +1,8 @@
-# Team Bookmark
+# TeamBookmark
 
 ## What is it ?
 
-Team Bookmark is an extension for Mozilla Firefox and Google Chrome.
+TeamBookmark is an addon for Mozilla Firefox and Google Chrome.
 
 It is used to easily synchronize a bookmark folder with a team.
 
@@ -22,7 +22,7 @@ To retrieve a `TeamKey`, you must register on the website [https://www.teambookm
 
 | Question  | Answer |
 | ------ | ------ |
-| Is it free ? | Yes it is, 100% free ! |
+| Is it free ? | Yes |
 | Chrome &amp; Firefox compatibility ? | Yes |
 | Work with Firefox Sync &amp; Google Sync ? | Yes |
 | Can I have read-only users in my team ? | Not yet, but it is planned for a future version |

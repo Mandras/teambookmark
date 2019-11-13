@@ -1,8 +1,8 @@
 {
 	"manifest_version": 2,
-	"name": "Team Bookmark",
+	"name": "TeamBookmark",
 	"author": "https://github.com/Mandras",
-	"version": "0.3",
+	"version": "0.5",
 	"default_locale": "en",
 
 	"content_security_policy": "script-src 'self' https://www.teambookmark.org; object-src 'self'",
@@ -23,12 +23,12 @@
 	},
 
 	"icons": {
-		"128": 	"icons/team-bookmark-128.png",
-		"96": 	"icons/team-bookmark-96.png",
-		"64": 	"icons/team-bookmark-64.png",
-		"48": 	"icons/team-bookmark-48.png",
-		"32": 	"icons/team-bookmark-32.png",
-		"16": 	"icons/team-bookmark-16.png"
+		"128": 	"icons/teambookmark-128.png",
+		"96": 	"icons/teambookmark-96.png",
+		"64": 	"icons/teambookmark-64.png",
+		"48": 	"icons/teambookmark-48.png",
+		"32": 	"icons/teambookmark-32.png",
+		"16": 	"icons/teambookmark-16.png"
 	},
 
 	"permissions": [
@@ -39,6 +39,6 @@
 	],
 
 	"background": {
-		"scripts": [ "js/team-bookmark.js" ]
+		"scripts": [ "js/teambookmark.js" ]
 	}
 }

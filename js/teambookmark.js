@@ -60,7 +60,7 @@ function synchronize_folder_found(items) {
 				title: emoji + ' ' + folder_name,
 				index: 0
 			}, function(node) {
-				console.info("team-bookmark: create root for toolbar");
+				console.info("teambookmark: create root for toolbar");
 				main_id = node.id;
 				compare_bookmark(node, this.bookmark);
 
@@ -76,7 +76,7 @@ function synchronize_folder_found(items) {
 				index: 0
 			});
 			creation.then(function(node) {
-				console.info("team-bookmark: create root for toolbar");
+				console.info("teambookmark: create root for toolbar");
 				main_id = node.id;
 				compare_bookmark(node, this.bookmark);
 
@@ -108,7 +108,7 @@ function synchronize_after_storage(item) {
 
 		if (options.key.length > 0) {
 
-			console.info("team-bookmark: launch synchronize");
+			console.info("teambookmark: launch synchronize");
 
 			var xhr = new XMLHttpRequest();
 			xhr.open('GET', domain + '/ajax/synchronize.php?key=' + options.key + '&ts=' + new Date().getTime(), true);
@@ -120,11 +120,11 @@ function synchronize_after_storage(item) {
 					var obj = xhr.response;
 
 					if (typeof obj.meta != "undefined" && typeof obj.meta.deleted != "undefined" && obj.meta.deleted == 1) {
-						console.error("team-bookmark: the TeamKey you are using is deleted");
+						console.error("teambookmark: the TeamKey you are using is deleted");
 						return ;
 					}
 
-					if (obj.app.name == "team-bookmark" && typeof obj.meta != "undefined" && typeof obj.meta.folder_name != "undefined" && obj.meta.folder_name.length > 0 && typeof obj.meta.emoji != "undefined" && typeof obj.meta.version != "undefined") {
+					if (obj.app.name == "teambookmark" && typeof obj.meta != "undefined" && typeof obj.meta.folder_name != "undefined" && obj.meta.folder_name.length > 0 && typeof obj.meta.emoji != "undefined" && typeof obj.meta.version != "undefined") {
 
 						if (typeof obj.bookmarks != "undefined") { empty_tbtree_issu = obj.bookmarks; }
 
@@ -155,14 +155,14 @@ function synchronize_after_storage(item) {
 					}
 				}
 				else {
-					console.error("team-bookmark: could not synchronize, XHR responses KO");
+					console.error("teambookmark: could not synchronize, XHR responses KO");
 				}
 			};
 			xhr.send();
 		}
-		else { console.info("team-bookmark: no key defined."); }
+		else { console.info("teambookmark: no key defined."); }
 	}
-	else { console.info("team-bookmark: options not yet defined."); }
+	else { console.info("teambookmark: options not yet defined."); }
 }
 
 // sub-function => update_continue_process
@@ -385,7 +385,7 @@ function synchronize() {
 
 // STARTUP
 
-console.info("team-bookmark: starting");
+console.info("teambookmark: starting");
 
 var is_chrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 if (is_chrome) { var browser = chrome; }
