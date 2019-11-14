@@ -1,6 +1,8 @@
 var domain = "https://www.teambookmark.org";
 var empty_tbtree_issu = [];
+var ping_interval = 60;
 var is_chrome = false;
+var has_trash = false;
 var root_id = '';
 var main_id = '';
 var folder_name;
@@ -12,7 +14,7 @@ function ff_error(error) { console.error(`${error}`); }
 
 // sub-function => delete_folder_found
 function delete_folder_found(items) {
-	for (var i = 0; i < items.length; i++) {
+	for (var i = 0 ; i < items.length ; i++) {
 		if (is_chrome) {
 			browser.bookmarks.removeTree(items[i].id);
 		}
@@ -42,9 +44,16 @@ function compare_old_folder_name(item) {
 // sub-function => synchronize_folder_found
 function synchronize_folder_found(items) {
 	if (items.length > 1) {
-		for (var i = 0; i < items.length; i++) {
+		for (var i = 0 ; i < items.length ; i++) {
 			if (is_chrome) {
-				browser.bookmarks.removeTree(items[i].id);
+				if (has_trash != false) {
+					browser.bookmarks.removeTree(items[i].id, function() {
+						browser.bookmarks.removeTree(this.check_delete);
+					}.bind({check_delete: items[i].id}));
+				}
+				else {
+					browser.bookmarks.removeTree(items[i].id);
+				}
 			}
 			else {
 				var removing = browser.bookmarks.removeTree(items[i].id);
@@ -129,8 +138,8 @@ function synchronize_after_storage(item) {
 						if (typeof obj.bookmarks != "undefined") { empty_tbtree_issu = obj.bookmarks; }
 
 						folder_name = obj.meta.folder_name;
-						emoji = obj.meta.emoji;
 						version = obj.meta.version;
+						emoji = obj.meta.emoji;
 
 						if (is_chrome) {
 							browser.storage.local.get("last_used_folder_name", compare_old_folder_name);
@@ -146,7 +155,24 @@ function synchronize_after_storage(item) {
 						if (browser.bookmarks.onMoved.hasListener(update_on_cloud))   { browser.bookmarks.onMoved.removeListener(update_on_cloud);   }
 
 						if (is_chrome) {
-							browser.bookmarks.search({ title: emoji + ' ' + folder_name }, synchronize_folder_found.bind({bookmark: obj.bookmarks}));
+							if (has_trash != false) {
+								browser.bookmarks.getSubTree(has_trash, function(node) {
+									if (node.length > 0 && typeof node[0].children != "undefined") {
+										for (var i = 0 ; i < node[0].children.length ; i++) {
+											if (node[0].children[i].title == emoji + ' ' + folder_name) {
+												console.info("teambookmark: folder found in Trash ... deleting ...");
+												browser.bookmarks.removeTree(node[0].children[i].id);
+											}
+										}
+										setTimeout(function() {
+											browser.bookmarks.search({ title: emoji + ' ' + folder_name }, synchronize_folder_found.bind({bookmark: obj.bookmarks}));
+										}, 50);
+									}
+								});
+							}
+							else {
+								browser.bookmarks.search({ title: emoji + ' ' + folder_name }, synchronize_folder_found.bind({bookmark: obj.bookmarks}));
+							}
 						}
 						else {
 							var searching = browser.bookmarks.search({ title: emoji + ' ' + folder_name });
@@ -180,7 +206,11 @@ function update_continue_process(node) {
 				});
 				updating.then(function() { }, ff_error);
 			}
-			
+		}
+		else if (has_trash != false && node[0].parentId == has_trash) {
+			console.info("teambookmark: the main folder has been sent to trash, reseting local version");
+			version = 0;
+			return ;
 		}
 
 		var json = JSON.stringify(node[0].children);
@@ -207,17 +237,24 @@ function update_continue_process(node) {
 		xhr.send(data);
 	}
 	else {
-		console.info("the main folder has been deleted, reseting local version");
+		console.info("teambookmark: the main folder has been deleted, reseting local version");
 		version = 0;
 	}
 }
 
 // sub-function => compare_subtree
 function compare_subtree(node) {
-	for (var i = 0; i < node[0].children.length; i++) {
+	for (var i = 0 ; i < node[0].children.length ; i++) {
 		if ((is_chrome && typeof node[0].children[i].url == "undefined") || (!is_chrome && node[0].children[i].type == "folder")) {
 			if (is_chrome) {
-				browser.bookmarks.removeTree(node[0].children[i].id);
+				if (has_trash != false) {
+					browser.bookmarks.removeTree(node[0].children[i].id, function() {
+						browser.bookmarks.removeTree(this.check_delete);
+					}.bind({check_delete: node[0].children[i].id}));
+				}
+				else {
+					browser.bookmarks.removeTree(node[0].children[i].id);
+				}
 			}
 			else {
 				var removing = browser.bookmarks.removeTree(node[0].children[i].id);
@@ -226,7 +263,14 @@ function compare_subtree(node) {
 		}
 		else {
 			if (is_chrome) {
-				browser.bookmarks.remove(node[0].children[i].id);
+				if (has_trash != false) {
+					browser.bookmarks.remove(node[0].children[i].id, function() {
+						browser.bookmarks.remove(this.check_delete);
+					}.bind({check_delete: node[0].children[i].id}));
+				}
+				else {
+					browser.bookmarks.remove(node[0].children[i].id);
+				}
 			}
 			else {
 				var removing = browser.bookmarks.remove(node[0].children[i].id);
@@ -241,18 +285,18 @@ function compare_subtree(node) {
 
 		if (typeof this.tb_tree == "undefined") {
 			var tb_tree = empty_tbtree_issu;
-			console.info("Fallback: tb_tree is undefined, get fallback value");
+			console.info("teambookmark: fallback - tb_tree is undefined, get fallback value");
 		}
 		else { var tb_tree = this.tb_tree; }
 
 		if (typeof this.system_tree == "undefined" || typeof this.system_tree.id == "undefined") {
 			var system_tree_id = main_id;
-			console.info("Fallback: system_tree.id is undefined, get fallback value");
+			console.info("teambookmark: fallback - system_tree.id is undefined, get fallback value");
 		}
 		else { var system_tree_id = this.system_tree.id; }
 
 		if (typeof tb_tree != "undefined" && tb_tree.length > 0 && typeof system_tree_id != "undefined") {
-			for (var i = 0; i < tb_tree.length; i++) {
+			for (var i = 0 ; i < tb_tree.length ; i++) {
 				/* BOOKMARK */
 				if (tb_tree[i].url != null) {
 					if (is_chrome) {
@@ -260,7 +304,7 @@ function compare_subtree(node) {
 							parentId: system_tree_id,
 							title: tb_tree[i].title,
 							url: tb_tree[i].url,
-							index: tb_tree[i].index
+							index: index
 						});
 					}
 					else {
@@ -270,7 +314,12 @@ function compare_subtree(node) {
 							url: tb_tree[i].url,
 							index: tb_tree[i].index
 						});
-						creation.then(function(node) { });
+						creation.then(function(node) {
+							setTimeout(function() {
+								var moving_bookmark = browser.bookmarks.move(this.node_id, {index: this.reassigned_index});
+								moving_bookmark.then(function() { }, ff_error);
+							}.bind({reassigned_index: this.reassigned_index, node_id: node.id}), 20);
+						}.bind({reassigned_index: tb_tree[i].index}));
 					}
 
 					index++;
@@ -281,7 +330,7 @@ function compare_subtree(node) {
 						browser.bookmarks.create({
 							parentId: system_tree_id,
 							title: tb_tree[i].title,
-							index: tb_tree[i].index
+							index: index
 						}, function(node) {
 							compare_bookmark(node, this.newtree);
 						}.bind({newtree: tb_tree[i].bookmarks}));
@@ -293,8 +342,12 @@ function compare_subtree(node) {
 							index: tb_tree[i].index
 						});
 						creation.then(function(node) {
+							setTimeout(function() {
+								var moving_bookmark = browser.bookmarks.move(this.node_id, {index: this.reassigned_index});
+								moving_bookmark.then(function() { }, ff_error);
+							}.bind({reassigned_index: this.reassigned_index, node_id: node.id}), 20);
 							compare_bookmark(node, this.newtree);
-						}.bind({newtree: tb_tree[i].bookmarks}));
+						}.bind({newtree: tb_tree[i].bookmarks, reassigned_index: tb_tree[i].index}));
 					}
 
 					index++;
@@ -308,7 +361,12 @@ function compare_subtree(node) {
 						url: '',
 						index: tb_tree[i].index
 					});
-					creation.then(function(node) { });
+					creation.then(function(node) {
+						setTimeout(function() {
+							var moving_bookmark = browser.bookmarks.move(this.node_id, {index: this.reassigned_index});
+							moving_bookmark.then(function() { }, ff_error);
+						}.bind({reassigned_index: this.reassigned_index, node_id: node.id}), 20);
+					}.bind({reassigned_index: tb_tree[i].index}));
 
 					index++;
 				}
@@ -351,7 +409,7 @@ function update_on_cloud() {
 	else {
 		var get = browser.bookmarks.getSubTree(main_id);
 		get.then(update_continue_process, function() {
-			console.info("the main folder has been deleted, reseting local version");
+			console.info("teambookmark: the main folder has been deleted, reseting local version");
 			version = 0;
 		});
 	}
@@ -385,22 +443,28 @@ function synchronize() {
 
 // STARTUP
 
-console.info("teambookmark: starting");
+console.info("teambookmark: starting addon");
 
 var is_chrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 if (is_chrome) { var browser = chrome; }
 
-// search for default root_id
+// search for default root_id and Trash root
 
 if (is_chrome) {
 	browser.bookmarks.getTree(function(items) {
 		root_id = items[0].children[0].id;
+
+		for (var i = 0 ; i < items[0].children.length ; i++) {
+			if (items[0].children[i].title == "Trash") {
+				has_trash = items[0].children[i].id;
+			}
+		}
 	});
 }
 else {
 	var tree = browser.bookmarks.getTree();
 	tree.then(function(items) {
-		for (var i = 0; i < items[0].children.length; i++) {
+		for (var i = 0 ; i < items[0].children.length ; i++) {
 			if (items[0].children[i].id.startsWith('toolbar_')) {
 				root_id = items[0].children[i].id;
 			}
@@ -414,6 +478,6 @@ else {
 
 setInterval(function () {
 	ping();
-}, 60000);
+}, ping_interval * 1000);
 
 synchronize();

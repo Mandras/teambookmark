@@ -1,3 +1,9 @@
+==== 0.6 ====
+
+- indexes are now auto-generated
+- fix for FF with bookmark order issue
+- Opera compatibility, including "Trash" root bookmark compatibility
+
 ==== 0.5 ====
 
 - rename "Team Bookmark" to "TeamBookmark"
