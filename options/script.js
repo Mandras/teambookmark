@@ -22,7 +22,6 @@ var is_chrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigato
 if (is_chrome) { var browser = chrome; }
 
 const save_options = () => {
-
 	if (is_chrome) {
 		browser.storage.local.set({
 			options: {

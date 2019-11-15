@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "TeamBookmark",
 	"author": "https://github.com/Mandras",
-	"version": "0.6",
+	"version": "0.7",
 	"default_locale": "en",
 
 	"content_security_policy": "script-src 'self' https://www.teambookmark.org; object-src 'self'",
@@ -36,6 +36,13 @@
 		"webRequest",
 		"bookmarks",
 		"storage"
+	],
+
+	"content_scripts": [
+		{
+			"matches": ["https://www.teambookmark.org/*"],
+			"js": ["js/website.js"]
+		}
 	],
 
 	"background": {

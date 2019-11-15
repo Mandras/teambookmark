@@ -108,6 +108,15 @@ function synchronize_folder_found(items) {
 	}, 1500);
 }
 
+// sub-function => test_options_after_storage
+function test_options_after_storage(item) {
+	if (typeof options != "undefined" && typeof options.key != "undefined" && typeof item.options !== "undefined" && typeof item.options.key !== "undefined" && options.key != item.options.key) {
+		console.info("teambookmark: option (key) has changed");
+		options.key = item.options.key;
+		version = 0;
+	}
+}
+
 // sub-function => synchronize_after_storage
 function synchronize_after_storage(item) {
 	if (typeof item.options !== "undefined" && typeof item.options.key !== "undefined") {
@@ -479,5 +488,17 @@ else {
 setInterval(function () {
 	ping();
 }, ping_interval * 1000);
+
+// test if the options has changed
+
+setInterval(function () {
+	if (is_chrome) {
+		browser.storage.local.get("options", test_options_after_storage);
+	}
+	else {
+		var storage = browser.storage.local.get("options");
+		storage.then(test_options_after_storage, ff_error);
+	}
+}, 5000);
 
 synchronize();
