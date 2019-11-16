@@ -55,11 +55,11 @@
 - Set back the valid `TeamKey` is well understand
 - Main folder delete from website is well understood
 
-## Issues found with previous tests ##
+## Bugs found with previous tests ##
 
-- ~~If the `TeamKey` is empty after an option change, there is pings with empty `TeamKey`~~
-- Main folder move trigger an update
-- Another bookmark change lead to an update
-- Outdated version is not accepted but do not lead to a sync, anyway it will sync with next ping
-- Changes made offline (bookmarks + main folder) are not overwrite once online
-- Order issue found with Mozilla
+- [x] If the `TeamKey` is empty after an option change, there is pings with empty `TeamKey`
+- [ ] Main folder move trigger a useless update
+- [ ] Another bookmark change lead to a useless update
+- [ ] Outdated version is not accepted but do not lead to a sync, anyway it will sync with next ping
+- [ ] Changes made offline (bookmarks + main folder) are not overwrite once online
+- [ ] Order issue found with Firefox again
