@@ -20,7 +20,7 @@ function set_key_after_storage(item) {
 	if (typeof item.options == "undefined" || typeof item.options.key == "undefined" || item.options.key.length == 0) {
 
 		var request = new XMLHttpRequest();
-		request.open('GET', 'https://www.teambookmark.org/ajax/get_teamkey.php', true);
+		request.open('GET', 'https://www.teambookmark.org/ajax/get_teamkey.php?ts=' + new Date().getTime(), true);
 
 		request.onload = function() {
 			if (this.status == 200) {

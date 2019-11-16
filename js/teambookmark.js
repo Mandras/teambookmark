@@ -387,7 +387,7 @@ function compare_subtree(node) {
 // DO PING
 
 function ping() {
-	if (typeof options != "undefined" && typeof options.key != "undefined") {
+	if (typeof options != "undefined" && typeof options.key != "undefined" && options.key.length > 0) {
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', domain + '/ajax/ping.php?key=' + options.key + '&version=' + version + '&ts=' + new Date().getTime(), true);
 		xhr.responseType = 'json';
