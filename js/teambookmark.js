@@ -1,8 +1,10 @@
 var domain = "https://www.teambookmark.org";
+var synchronization_processing = false;
 var empty_tbtree_issu = [];
 var ping_interval = 60;
 var is_chrome = false;
 var has_trash = false;
+var stringified = '';
 var root_id = '';
 var main_id = '';
 var folder_name;
@@ -105,6 +107,16 @@ function synchronize_folder_found(items) {
 		browser.bookmarks.onRemoved.addListener(update_on_cloud);
 		browser.bookmarks.onChanged.addListener(update_on_cloud);
 		browser.bookmarks.onMoved.addListener(update_on_cloud);
+
+		if (main_id.length > 0) {
+			if (is_chrome) {
+				browser.bookmarks.getSubTree(main_id, stringify_bookmark);
+			}
+			else {
+				var get = browser.bookmarks.getSubTree(main_id);
+				get.then(stringify_bookmark, ff_error);
+			}
+		}
 	}, 1500);
 }
 
@@ -113,6 +125,7 @@ function test_options_after_storage(item) {
 	if (typeof options != "undefined" && typeof options.key != "undefined" && typeof item.options !== "undefined" && typeof item.options.key !== "undefined" && options.key != item.options.key) {
 		console.info("teambookmark: option (key) has changed");
 		options.key = item.options.key;
+		stringified = '';
 		version = 0;
 	}
 }
@@ -129,7 +142,7 @@ function synchronize_after_storage(item) {
 			console.info("teambookmark: launch synchronize");
 
 			var xhr = new XMLHttpRequest();
-			xhr.open('GET', domain + '/ajax/synchronize.php?key=' + options.key + '&ts=' + new Date().getTime(), true);
+			xhr.open('GET', domain + '/api/synchronize.php?key=' + options.key + '&ts=' + new Date().getTime(), true);
 			xhr.responseType = 'json';
 
 			xhr.onload = function() {
@@ -139,6 +152,7 @@ function synchronize_after_storage(item) {
 
 					if (typeof obj.meta != "undefined" && typeof obj.meta.deleted != "undefined" && obj.meta.deleted == 1) {
 						console.error("teambookmark: the TeamKey you are using is deleted");
+						synchronization_processing = false;
 						return ;
 					}
 
@@ -187,17 +201,36 @@ function synchronize_after_storage(item) {
 							var searching = browser.bookmarks.search({ title: emoji + ' ' + folder_name });
 							searching.then(synchronize_folder_found.bind({bookmark: obj.bookmarks}), ff_error);
 						}
+
+						setTimeout(function() { synchronization_processing = false; }, 100);
+					}
+					else {
+						console.error("teambookmark: JSON content datas does not match standart");
+						synchronization_processing = false;
 					}
 				}
 				else {
 					console.error("teambookmark: could not synchronize, XHR responses KO");
+					synchronization_processing = false;
 				}
+			};
+			xhr.onerror = function(e) {
+				if (typeof e.type != "undefined" && e.type == "error" && typeof e.loaded != "undefined" && e.loaded == 0) {
+					console.error("Could not synchronize, may be offline ?");
+				}
+				synchronization_processing = false;
 			};
 			xhr.send();
 		}
-		else { console.info("teambookmark: no key defined."); }
+		else {
+			console.info("teambookmark: no key defined.");
+			synchronization_processing = false;
+		}
 	}
-	else { console.info("teambookmark: options not yet defined."); }
+	else {
+		console.info("teambookmark: options not yet defined.");
+		synchronization_processing = false;
+	}
 }
 
 // sub-function => update_continue_process
@@ -218,35 +251,55 @@ function update_continue_process(node) {
 		}
 		else if (has_trash != false && node[0].parentId == has_trash) {
 			console.info("teambookmark: the main folder has been sent to trash, reseting local version");
+			stringified = '';
 			version = 0;
 			return ;
 		}
 
 		var json = JSON.stringify(node[0].children);
 
-		var data = new FormData();
-		data.append('key', options.key);
-		data.append('version', version);
-		data.append('is_chrome', is_chrome);
-		data.append('json', json);
+		if (json == stringified) {
+			console.log("teambookmark: no change detected, avoid useless update");
+		}
+		else {
+			var data = new FormData();
+			data.append('key', options.key);
+			data.append('version', version);
+			data.append('is_chrome', is_chrome);
+			data.append('json', json);
 
-		var xhr = new XMLHttpRequest();
-		xhr.open('POST', domain + '/ajax/update.php?ts=' + new Date().getTime(), true);
-		xhr.responseType = 'json';
-		xhr.onload = function() {
-			if (xhr.status === 200) {
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', domain + '/api/update.php?ts=' + new Date().getTime(), true);
+			xhr.responseType = 'json';
+			xhr.onload = function() {
+				if (xhr.status === 200) {
 
-				var obj = xhr.response;
+					var obj = xhr.response;
 
-				if (obj.action == "update_version" && obj.version > 0) {
-					version = obj.version;
+					if (obj.action == "update_version" && obj.version > 0) {
+						version = obj.version;
+					}
+					else if (obj.action == "invalid_version" && obj.version < version) {
+						stringified = '';
+						version = 0;
+					}
+					else if (obj.action == "invalid_version" && obj.version > version) {
+						synchronize();
+					}
 				}
-			}
-		};
-		xhr.send(data);
+			};
+			xhr.onerror = function(e) {
+				if (typeof e.type != "undefined" && e.type == "error" && typeof e.loaded != "undefined" && e.loaded == 0) {
+					console.error("Could not update, may be offline ?");
+					version = 0;
+				}
+			};
+			xhr.send(data);
+		}
 	}
 	else {
 		console.info("teambookmark: the main folder has been deleted, reseting local version");
+		stringified = '';
 		version = 0;
 	}
 }
@@ -321,14 +374,14 @@ function compare_subtree(node) {
 							parentId: system_tree_id,
 							title: tb_tree[i].title,
 							url: tb_tree[i].url,
-							index: tb_tree[i].index
+							index: index
 						});
 						creation.then(function(node) {
 							setTimeout(function() {
 								var moving_bookmark = browser.bookmarks.move(this.node_id, {index: this.reassigned_index});
 								moving_bookmark.then(function() { }, ff_error);
 							}.bind({reassigned_index: this.reassigned_index, node_id: node.id}), 20);
-						}.bind({reassigned_index: tb_tree[i].index}));
+						}.bind({reassigned_index: index}));
 					}
 
 					index++;
@@ -348,7 +401,7 @@ function compare_subtree(node) {
 						var creation = browser.bookmarks.create({
 							parentId: system_tree_id,
 							title: tb_tree[i].title,
-							index: tb_tree[i].index
+							index: index
 						});
 						creation.then(function(node) {
 							setTimeout(function() {
@@ -356,12 +409,13 @@ function compare_subtree(node) {
 								moving_bookmark.then(function() { }, ff_error);
 							}.bind({reassigned_index: this.reassigned_index, node_id: node.id}), 20);
 							compare_bookmark(node, this.newtree);
-						}.bind({newtree: tb_tree[i].bookmarks, reassigned_index: tb_tree[i].index}));
+						}.bind({newtree: tb_tree[i].bookmarks, reassigned_index: index}));
 					}
 
 					index++;
 				}
 				/* SEPARATOR */
+				/*
 				else if (!is_chrome) {
 					var creation = browser.bookmarks.create({
 						parentId: system_tree_id,
@@ -379,6 +433,7 @@ function compare_subtree(node) {
 
 					index++;
 				}
+				*/
 			}
 		}
 	}.bind({tb_tree: this.tb_tree, system_tree: this.system_tree}), 50);
@@ -389,7 +444,7 @@ function compare_subtree(node) {
 function ping() {
 	if (typeof options != "undefined" && typeof options.key != "undefined" && options.key.length > 0) {
 		var xhr = new XMLHttpRequest();
-		xhr.open('GET', domain + '/ajax/ping.php?key=' + options.key + '&version=' + version + '&ts=' + new Date().getTime(), true);
+		xhr.open('GET', domain + '/api/ping.php?key=' + options.key + '&version=' + version + '&ts=' + new Date().getTime(), true);
 		xhr.responseType = 'json';
 
 		xhr.onload = function() {
@@ -400,6 +455,11 @@ function ping() {
 				if (obj.version > 0 && obj.version > version) {
 					synchronize();
 				}
+			}
+		};
+		xhr.onerror = function(e) {
+			if (typeof e.type != "undefined" && e.type == "error" && typeof e.loaded != "undefined" && e.loaded == 0) {
+				console.error("Could not ping, may be offline ?");
 			}
 		};
 		xhr.send();
@@ -419,8 +479,17 @@ function update_on_cloud() {
 		var get = browser.bookmarks.getSubTree(main_id);
 		get.then(update_continue_process, function() {
 			console.info("teambookmark: the main folder has been deleted, reseting local version");
+			stringified = '';
 			version = 0;
 		});
+	}
+}
+
+// WE STOCK BOOKMARKS IN VARIABLE TO AVOID USELESS UPDATE
+
+function stringify_bookmark(node) {
+	if (typeof node != "undefined" && typeof node[0] != "undefined" && typeof node[0].children != "undefined") {
+		stringified = JSON.stringify(node[0].children);
 	}
 }
 
@@ -441,6 +510,13 @@ function compare_bookmark(system_tree, tb_tree) {
 // FULL SYNCHRONIZE
 
 function synchronize() {
+
+	if (synchronization_processing) {
+		console.info("teambookmark: synchronization is already processing, so we dismiss this one");
+		return ;
+	}
+	synchronization_processing = true;
+
 	if (is_chrome) {
 		browser.storage.local.get("options", synchronize_after_storage);
 	}

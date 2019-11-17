@@ -58,8 +58,8 @@
 ## Bugs found with previous tests ##
 
 - [x] ~~If the `TeamKey` is empty after an option change, there is useless pings with empty `TeamKey`~~
-- [ ] Main folder move trigger a useless update
-- [ ] Another bookmark change lead to a useless update
-- [ ] Outdated version is not accepted but do not lead to a sync, anyway it will sync with next ping
-- [ ] Changes made offline (bookmarks + main folder) are not overwrite once online
-- [ ] Order issue found with Firefox again
+- [x] ~~Main folder move trigger a useless update~~
+- [x] ~~Another bookmark change lead to a useless update~~
+- [x] ~~Outdated version is not accepted but do not lead to a sync, anyway it will sync with next ping~~
+- [x] ~~Changes made offline (bookmarks + main folder) are not overwrite once online~~
+- [x] ~~Order issue found with Firefox again~~
