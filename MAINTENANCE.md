@@ -41,7 +41,7 @@
 - The main folder is well filled and all bookmarks are in orders
 - Multiple folders childs/parents work well
 - Empty folders still work
-- Separator works on FF and cross-browser is well adapted
+- ~~Separator works on FF and cross-browser is well adapted~~
 - Main folder move is accepted
 - Main folder rename isn't accepted
 - Main folder delete lead to recreate
