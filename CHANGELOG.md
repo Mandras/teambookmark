@@ -4,11 +4,11 @@
 
 - **Unit tests fix**: avoid useless pings with empty `TeamKey`
 - **Unit tests fix**: avoid useless updates with no modifications in root folder
-- **Unit tests fix**: now use `api` instead of `ajax` in URL
 - **Unit tests fix**: now ignoring separators to avoid order issues with FF
 - **Unit tests fix**: FF now use auto-generated indexes too
 - **Unit tests fix**: offline detection so in this case, resetting local version number
 - avoid double synchronization with a protection, usefull in case of update > invalid_version wich may combine with a ping
+- now use `api` instead of `ajax` in URL
 
 ### 0.7 ###
 
