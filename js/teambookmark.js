@@ -584,18 +584,6 @@ setInterval(function () {
 	ping();
 }, ping_interval * 1000);
 
-// test if the options has changed ; still useless since messages handlers
-
-// setInterval(function () {
-// 	if (is_chrome) {
-// 		browser.storage.local.get("options", test_options_after_storage);
-// 	}
-// 	else {
-// 		var storage = browser.storage.local.get("options");
-// 		storage.then(test_options_after_storage, ff_error);
-// 	}
-// }, 5000);
-
 // launch the on-launch synchronize
 
 synchronize();
