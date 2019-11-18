@@ -565,7 +565,7 @@ else {
 browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (typeof request.action != "undefined" && request.action.length > 0) {
 		switch (request.action) {
-			case "synchronize":
+			case "options_saved":
 				if (is_chrome) {
 					browser.storage.local.get("options", test_options_after_storage);
 				}

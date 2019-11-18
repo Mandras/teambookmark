@@ -13,12 +13,12 @@ function after_storage_set() {
 
 	if (is_chrome) {
 		browser.runtime.sendMessage({
-			action: "synchronize"
+			action: "options_saved"
 		}, function() { });
 	}
 	else {
 		var sending = browser.runtime.sendMessage({
-			action: "synchronize"
+			action: "options_saved"
 		});
 		sending.then(function() { }, ff_error);  
 	}
