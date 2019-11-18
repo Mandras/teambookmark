@@ -127,6 +127,8 @@ function test_options_after_storage(item) {
 		options.key = item.options.key;
 		stringified = '';
 		version = 0;
+
+		synchronize();
 	}
 }
 
@@ -564,7 +566,13 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (typeof request.action != "undefined" && request.action.length > 0) {
 		switch (request.action) {
 			case "synchronize":
-				synchronize();
+				if (is_chrome) {
+					browser.storage.local.get("options", test_options_after_storage);
+				}
+				else {
+					var storage = browser.storage.local.get("options");
+					storage.then(test_options_after_storage, ff_error);
+				}
 			break;
 		}
 	}
@@ -576,16 +584,18 @@ setInterval(function () {
 	ping();
 }, ping_interval * 1000);
 
-// test if the options has changed
+// test if the options has changed ; still useless since messages handlers
 
-setInterval(function () {
-	if (is_chrome) {
-		browser.storage.local.get("options", test_options_after_storage);
-	}
-	else {
-		var storage = browser.storage.local.get("options");
-		storage.then(test_options_after_storage, ff_error);
-	}
-}, 5000);
+// setInterval(function () {
+// 	if (is_chrome) {
+// 		browser.storage.local.get("options", test_options_after_storage);
+// 	}
+// 	else {
+// 		var storage = browser.storage.local.get("options");
+// 		storage.then(test_options_after_storage, ff_error);
+// 	}
+// }, 5000);
+
+// launch the on-launch synchronize
 
 synchronize();
