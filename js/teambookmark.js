@@ -558,6 +558,17 @@ else {
 	}, ff_error);
 }
 
+// messages handlers
+
+browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if (typeof request.action != "undefined" && request.action.length > 0) {
+		switch (request.action) {
+			case "synchronize":
+				synchronize();
+			break;
+		}
+	}
+});
 
 // launch auto synch
 

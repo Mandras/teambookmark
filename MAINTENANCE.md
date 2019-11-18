@@ -50,7 +50,7 @@
 - Main folder rename from website is updated automatically
 - Changes made offline (bookmarks + main folder) are well overwrite once online (without browser restart)
 - Not URL link isn't blocking the addon
-- `TeamKey` change is working
+- `TeamKey` change is working and result to an auto-synchronize
 - Invalid or empty `TeamKey` isn't blocking the addon
 - Set back the valid `TeamKey` is well understand
 - Main folder delete from website is well understood

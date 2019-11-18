@@ -10,6 +10,18 @@ function ff_error(error) { console.log(`An error: ${error}`); }
 function after_storage_set() {
 	$("saved").classList.add("saving");
 	setTimeout(function() { $("saved").classList.remove("saving"); }, 2000);
+
+	if (is_chrome) {
+		browser.runtime.sendMessage({
+			action: "synchronize"
+		}, function() { });
+	}
+	else {
+		var sending = browser.runtime.sendMessage({
+			action: "synchronize"
+		});
+		sending.then(function() { }, ff_error);  
+	}
 }
 
 function after_storage_get(item) {
