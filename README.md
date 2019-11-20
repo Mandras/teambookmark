@@ -22,11 +22,12 @@ To retrieve a `TeamKey`, you must register on the website [https://www.teambookm
 
 | Question  | Answer |
 | ------ | ------ |
-| Is it free ? | Yes |
-| Chrome &amp; Firefox compatibility ? | Yes |
+| Can I have read-only users in my team ? | Not yet, but it's planned |
+| Is there a limit to the size of the team ? | Unlimited |
+| Is there a limit to the number of bookmarks ? | Unlimited |
+| Cross-browser compatibility ? | Yes |
 | Work with Firefox Sync &amp; Google Sync ? | Yes |
-| Can I have read-only users in my team ? | Not yet, but it is planned for a future version |
-| Is there a limit to the size of the team ? | Team size is unlimited |
+| Is it free ? | Yes |
 
 ## Download
 
