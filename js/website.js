@@ -65,6 +65,21 @@ if (window.location.hostname == "www.teambookmark.org") {
 			storage.then(set_key_after_storage, ff_error);
 		}
 	}
+	if ($('save-new-folder-name')) {
+		$('save-new-folder-name').addEventListener('click', function() {
+			if (is_chrome) {
+				browser.runtime.sendMessage({
+					action: "folder_name_changed"
+				}, function() { });
+			}
+			else {
+				var sending = browser.runtime.sendMessage({
+					action: "folder_name_changed"
+				});
+				sending.then(function() { }, ff_error);  
+			}
+		});
+	}
 
 	$("body").classList.add('has-addon');
 }

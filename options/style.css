@@ -13,6 +13,11 @@ a, a:visited, a:hover {
 	color: #222;
 }
 
+::placeholder {
+	color: #AAAAAA;
+	opacity: 1;
+}
+
 code {
 	background-color: #EEEEEE;
 	font-family: monospace;
@@ -54,8 +59,8 @@ button:active {
 
 table {
 	border-collapse: collapse;
-	margin: 15px 0;
-	width: 100%;
+	margin: 15px auto;
+	width: 500px;
 }
 
 th {
@@ -85,3 +90,7 @@ ul {
 }
 
 #saved.saving { opacity: 1; }
+
+@media (max-width: 500px) {
+	table { min-width: auto; }
+}

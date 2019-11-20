@@ -32,11 +32,12 @@
 
 ## Unit tests checklist ##
 
+- Option page open automatically after addon installation
 - `TeamKey` is set automatically after email validation
 - After email validation, if a `TeamKey` already exist, the addon do not overwrite
 - The CSS class `has-addon` is well set on `body` of the website
 - The main folder is created in toolbar
-- Bookmark + folder create/delete is accepted / updated automatically
+- Bookmark + folder create/delete/edit is accepted / updated automatically
 - Bookmark order change is accepted and updated automatically
 - The main folder is well filled and all bookmarks are in orders
 - Multiple folders childs/parents work well
@@ -47,7 +48,7 @@
 - Main folder delete lead to recreate
 - Another bookmark change do not lead to an update
 - Outdated version is not accepted and lead to an update
-- Main folder rename from website is updated automatically
+- Main folder rename from website is updated immediately
 - Changes made offline (bookmarks + main folder) are well overwrite once online (without browser restart)
 - Not URL link isn't blocking the addon
 - `TeamKey` change is working and result to an auto-synchronize

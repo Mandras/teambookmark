@@ -98,6 +98,18 @@ function synchronize_folder_found(items) {
 		}		
 	}
 	else if (items.length == 1) {
+		setTimeout(function() {
+			if (is_chrome) {
+				browser.storage.local.set({
+					last_used_folder_name: emoji + ' ' + folder_name
+				}, function() { });
+			}
+			else {
+				browser.storage.local.set({
+					last_used_folder_name: emoji + ' ' + folder_name
+				}).then(function() { }, ff_error);
+			}
+		}, 100);
 		main_id = items[0].id;
 		compare_bookmark(items[0], this.bookmark);
 	}
@@ -528,12 +540,20 @@ function synchronize() {
 	}
 }
 
-// STARTUP
+// INIT
 
 console.info("teambookmark: starting addon");
 
 var is_chrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 if (is_chrome) { var browser = chrome; }
+
+// ON INSTALLED
+
+browser.runtime.onInstalled.addListener(function() {
+	browser.runtime.openOptionsPage();
+});
+
+// STARTUP
 
 // search for default root_id and Trash root
 
@@ -573,6 +593,9 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 					var storage = browser.storage.local.get("options");
 					storage.then(test_options_after_storage, ff_error);
 				}
+			break;
+			case "folder_name_changed":
+				setTimeout(function() { synchronize(); }, 500);
 			break;
 		}
 	}
