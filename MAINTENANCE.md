@@ -23,7 +23,7 @@
 
 ### Google Chrome ###
 
-[https://chrome.google.com/webstore/developer/dashboard](https://chrome.google.com/webstore/developer/dashboard)
+[https://chrome.google.com/webstore/developer/edit/fdimbcfjbicdaiedpackfiokffllbgie](https://chrome.google.com/webstore/developer/edit/fdimbcfjbicdaiedpackfiokffllbgie)
 
 ### Opera ###
 
