@@ -535,8 +535,7 @@ function synchronize() {
 		browser.storage.local.get("options", synchronize_after_storage);
 	}
 	else {
-		var storage = browser.storage.local.get("options");
-		storage.then(synchronize_after_storage, ff_error);
+		browser.storage.local.get("options").then(synchronize_after_storage, ff_error);
 	}
 }
 
@@ -549,8 +548,10 @@ if (is_chrome) { var browser = chrome; }
 
 // ON INSTALLED
 
-browser.runtime.onInstalled.addListener(function() {
-	browser.runtime.openOptionsPage();
+browser.runtime.onInstalled.addListener(function(obj) {
+	if (obj.reason === 'install') {
+		browser.runtime.openOptionsPage();
+	}
 });
 
 // STARTUP
@@ -572,7 +573,7 @@ else {
 	var tree = browser.bookmarks.getTree();
 	tree.then(function(items) {
 		for (var i = 0 ; i < items[0].children.length ; i++) {
-			if (items[0].children[i].id.startsWith('toolbar_')) {
+			if (typeof items[0].children[i].id != "undefined" && items[0].children[i].id.length > 0 && items[0].children[i].id.startsWith('toolbar_')) {
 				root_id = items[0].children[i].id;
 			}
 		}
@@ -590,8 +591,7 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 					browser.storage.local.get("options", test_options_after_storage);
 				}
 				else {
-					var storage = browser.storage.local.get("options");
-					storage.then(test_options_after_storage, ff_error);
+					browser.storage.local.get("options").then(test_options_after_storage, ff_error);
 				}
 			break;
 			case "folder_name_changed":

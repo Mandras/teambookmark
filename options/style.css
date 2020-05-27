@@ -92,5 +92,13 @@ ul {
 #saved.saving { opacity: 1; }
 
 @media (max-width: 500px) {
-	table { min-width: auto; }
+	table {
+		min-width: auto;
+		width: 100%;
+	}
+}
+
+@media (max-width: 400px) {
+	table tr > th { display: none; }
+	table tr:first-child > th { display: table-cell; }
 }

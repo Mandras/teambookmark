@@ -1,5 +1,13 @@
 ## THE CHANGELOG ##
 
+### 1.0 ###
+
+- Microsoft Edge Chromium compatibility
+- better responsive for option page
+- some minors fixs
+- option page wont open after browser update but only after the install
+- reassign indexes for FF after bookmark creation, to be sure the order is correct
+
 ### 0.9 ###
 
 - use messages handlers to auto-synchronize after an option update

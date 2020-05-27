@@ -14,5 +14,5 @@ In addition, all datas transfered between the user / our website / our addon are
 
 Using our addon, the user does not provide any personal data.
 Bookmarks sharing is done only via an encrypted key transfer, no personal information will transit through the network at this moment.
-The content of the bookmark may be sent or received in case of synchronization update.
-Anyone with the key can retrieve the contents of the bookmark.
+The content of the root bookmarks folder may be sent or received in case of synchronization update.
+Anyone with the key can retrieve (and edit) the contents of the bookmarks folder.

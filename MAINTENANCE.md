@@ -14,6 +14,10 @@
 
 [opera:extensions](opera:extensions)
 
+### Edge ###
+
+[edge://extensions/](edge://extensions/)
+
 
 ## Addon dashboards ##
 
@@ -29,6 +33,9 @@
 
 [https://addons.opera.com/developer/package/242305/](https://addons.opera.com/developer/package/242305/)
 
+### Edge ###
+
+[https://partner.microsoft.com/en-us/dashboard/microsoftedge/overview](https://partner.microsoft.com/en-us/dashboard/microsoftedge/overview)
 
 ## Unit tests checklist ##
 
@@ -64,5 +71,5 @@
 - [x] ~~Outdated version is not accepted but do not lead to a sync, anyway it will sync with next ping~~
 - [x] ~~Changes made offline (bookmarks + main folder) are not overwrite once online~~
 - [x] ~~Order issue found with Firefox again~~
-- [ ] Order issue with Firefox still here: [https://bugzilla.mozilla.org/show_bug.cgi?id=1597291](https://bugzilla.mozilla.org/show_bug.cgi?id=1597291)
-- [ ] After Browser update, the option page open for no reason
+- [x] Order issue with Firefox still here: [https://bugzilla.mozilla.org/show_bug.cgi?id=1597291](https://bugzilla.mozilla.org/show_bug.cgi?id=1597291)
+- [x] After Browser update, the option page open for no reason
