@@ -2,7 +2,7 @@
 
 ## What is it ?
 
-TeamBookmark is an addon for Mozilla Firefox, Google Chrome and Opera.
+TeamBookmark is an addon for Mozilla Firefox, Google Chrome, Opera and Microsoft Edge.
 
 It is used to easily synchronize a bookmark folder with a team.
 

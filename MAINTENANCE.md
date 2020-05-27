@@ -27,7 +27,7 @@
 
 ### Google Chrome ###
 
-[https://chrome.google.com/webstore/developer/edit/fdimbcfjbicdaiedpackfiokffllbgie](https://chrome.google.com/webstore/developer/edit/fdimbcfjbicdaiedpackfiokffllbgie)
+[https://chrome.google.com/webstore/devconsole](https://chrome.google.com/webstore/devconsole)
 
 ### Opera ###
 
