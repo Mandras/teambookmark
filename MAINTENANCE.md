@@ -71,5 +71,5 @@
 - [x] ~~Outdated version is not accepted but do not lead to a sync, anyway it will sync with next ping~~
 - [x] ~~Changes made offline (bookmarks + main folder) are not overwrite once online~~
 - [x] ~~Order issue found with Firefox again~~
-- [x] Order issue with Firefox still here: [https://bugzilla.mozilla.org/show_bug.cgi?id=1597291](https://bugzilla.mozilla.org/show_bug.cgi?id=1597291)
-- [x] After Browser update, the option page open for no reason
+- [x] ~~Order issue with Firefox still here: [https://bugzilla.mozilla.org/show_bug.cgi?id=1597291](https://bugzilla.mozilla.org/show_bug.cgi?id=1597291)~~
+- [x] ~~After Browser update, the option page open for no reason~~
